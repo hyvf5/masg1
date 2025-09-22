@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>إرسال رسالة للبوت</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+      width: 400px;
+      max-width: 100%;
+      text-align: center;
+      padding: 28px 24px;
+      color: #fff;
+      animation: fadeIn 0.9s ease;
+    }
+
+    h2 {
+      margin: 0 0 18px 0;
+      font-size: 22px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: .5px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      resize: vertical;
+      min-height: 120px;
+      font-size: 15px;
+      direction: rtl;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      outline: none;
+      transition: 0.25s;
+    }
+    textarea::placeholder { color: rgba(255,255,255,0.7); }
+    textarea:focus {
+      background: rgba(255,255,255,0.25);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.35);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 6px 20px rgba(118,75,162,0.4);
+    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(118,75,162,0.6); }
+
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      min-height: 20px;
+      color: #f0f0f0;
+    }
+
+    footer {
+      margin-top: 18px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>✉ أرسل رسالة للبوت</h2>
+    <form onsubmit="sendMessage(event)">
+      <textarea id="msg" placeholder="اكتب رسالتك هنا..."></textarea>
+      <button id="sendBtn" type="submit">إرسال</button>
+      <div id="status" class="status"></div>
+    </form>
+    <footer>رسائلك تُرسل للبوت مباشرة ✅</footer>
+  </div>
+
+  <script>
+    async function sendMessage(e) {
+      e.preventDefault();
+      const text = document.getElementById('msg').value.trim();
+      const status = document.getElementById('status');
+      const btn = document.getElementById('sendBtn');
+
+      if (!text) {
+        status.innerText = "⚠ اكتب رسالة أولاً.";
+        return;
+      }
+
+      btn.disabled = true;
+      status.innerText = "⏳ جارٍ الإرسال...";
+
+      // ضع التوكن و الـ chat_id الخاصين بك هنا
+      const TOKEN = "7578637488:AAHeCS-Kij9JRgLmHMzWYJDC0sv6-HYluis";
+      const CHAT_ID = "6205062610";
+      const BOT_URL = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+
+      try {
+        const res = await fetch(BOT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: CHAT_ID, text: text }) // أرسل النص مباشرة
+        });
+
+        if (res.ok) {
+          status.innerText = "✅ تم الإرسال بنجاح.";
+          document.getElementById('msg').value = "";
+        } else {
+          status.innerText = "❌ فشل الإرسال. تحقق من التوكن أو الـ chat_id.";
+        }
+      } catch (err) {
+        status.innerText = "⚠ خطأ في الاتصال.";
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
